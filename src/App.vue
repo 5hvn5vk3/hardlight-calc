@@ -141,6 +141,11 @@ const calculate = () => {
 </template>
 
 <style scoped>
+
+:root {
+  color-scheme: light; /* ダークモードにならないようにします */
+} 
+
 .hard-light-calculator {
   display: flex;
   flex-direction: column;
