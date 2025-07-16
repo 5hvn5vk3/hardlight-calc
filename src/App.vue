@@ -140,11 +140,11 @@ const calculate = () => {
   </div>
 </template>
 
-<style scoped>
+<style>
 
-:root {
-  color-scheme: light; /* ダークモードにならないようにします */
-} 
+html {
+  color-scheme: light only;
+}
 
 .hard-light-calculator {
   display: flex;
@@ -169,6 +169,7 @@ const calculate = () => {
 }
 
 h2 {
+  color: #000 !important;
   margin: 0 0 0px;
   font-size: 1.2em;
   text-align: left;
@@ -180,7 +181,12 @@ h2 {
   gap: 10px;
 }
 
+label{
+  color: #000 !important;
+}
+
 .label {
+  color: #000 !important;
   width: 60px;
   font-size: 0.9em;
   font-weight: bold;
@@ -203,6 +209,8 @@ h2 {
 }
 
 input[type="number"] {
+  color: #000 !important;
+  background-color: #fff !important;
   width: 45px;
   text-align: right;
   padding: 5px;
