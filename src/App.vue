@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { ref, computed } from 'vue'; // computed をインポート
-// 今後やること：Mapを使用して色データを初期化するヘルパー関数createColorMapを作成する。
+
 // Color data structure // 今後やること：ColorRGBをMap<string, number>に変更する。
 interface ColorRGB {
   r: number;
@@ -9,13 +9,13 @@ interface ColorRGB {
   b: number;
 }
 
-// Reactive state for colors // 今後やること：createMapを用いてColorRGBをMap<string, number>に変更する。
+// Reactive state for colors
 const baseColor = ref<ColorRGB>({ r: 0, g: 0, b: 0 });
 const blendColor = ref<ColorRGB>({ r: 0, g: 0, b: 0 });
 const compositeColor = ref<ColorRGB>({ r: 0, g: 0, b: 0 });
 
-// 今後やること：Mapから文字列を生成するヘルパー関数を作成（baseColorなどがMapになるため）
-// 色プレビューのスタイルを動的に生成するための算出プロパティ // 今後やること：Mapの値に基づいて動的にスタイルを生成するための算出プロパティを作成
+
+// 色プレビューのスタイルを動的に生成するための算出プロパティ 
 const baseColorStyle = computed(() => `rgb(${baseColor.value.r}, ${baseColor.value.g}, ${baseColor.value.b})`);
 const blendColorStyle = computed(() => `rgb(${blendColor.value.r}, ${blendColor.value.g}, ${blendColor.value.b})`);
 const compositeColorStyle = computed(() => `rgb(${compositeColor.value.r}, ${compositeColor.value.g}, ${compositeColor.value.b})`);
