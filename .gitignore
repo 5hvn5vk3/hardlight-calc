@@ -1,26 +1,28 @@
 # Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+vue-ver/hardlight-calc/logs
+vue-ver/hardlight-calc/*.log
+vue-ver/hardlight-calc/npm-debug.log*
+vue-ver/hardlight-calc/yarn-debug.log*
+vue-ver/hardlight-calc/yarn-error.log*
+vue-ver/hardlight-calc/pnpm-debug.log*
+vue-ver/hardlight-calc/lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+vue-ver/hardlight-calc/node_modules
+vue-ver/hardlight-calc/dist
+vue-ver/hardlight-calc/dist-ssr
+vue-ver/hardlight-calc/*.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+vue-ver/hardlight-calc/.vscode/*
+vue-ver/hardlight-calc/.vscode/!.vscode/extensions.json
+vue-ver/hardlight-calc/.vscode/extensions.json
+vue-ver/hardlight-calc/.idea
+vue-ver/hardlight-calc/.DS_Store
+vue-ver/hardlight-calc/*.suo
+vue-ver/hardlight-calc/*.ntvs*
+vue-ver/hardlight-calc/*.njsproj
+vue-ver/hardlight-calc/*.sln
+vue-ver/hardlight-calc/*.sw?
 
-/memo/
+vue-ver/hardlight-calc/memo/
+

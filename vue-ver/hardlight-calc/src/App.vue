@@ -45,8 +45,8 @@ const invertHardLightChannel = (base: number, result: number): number => {
   }
 
   // Screenモードでの逆算結果(S)が128以上であればSを、そうでなければMを採用する。
-  const finalValue = S >= 128 ? S : M; // 次のブランチ "both-zero" では消す
-  // const finalValue = base === 0 && result === 0 ? 127 : (S >= 128 ? S : M); // 次のブランチ "both-zero" ではこちらを採用
+  
+  const finalValue = base === 0 && result === 0 ? 127 : (S >= 128 ? S : M); // 次のブランチ "both-zero" ではこちらを採用
 
   const roundedValue = Math.round(finalValue);
   // 結果を0-255の範囲に収める
