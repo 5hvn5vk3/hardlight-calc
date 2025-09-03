@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { ref, computed } from 'vue'; // computed をインポート
+import { ref, computed } from 'vue';
 
 // Color data structure
 interface ColorRGB {
@@ -21,47 +21,60 @@ const blendColorStyle = computed(() => `rgb(${blendColor.value.r}, ${blendColor.
 const compositeColorStyle = computed(() => `rgb(${compositeColor.value.r}, ${compositeColor.value.g}, ${compositeColor.value.b})`);
 
 
-// Calculation logic
-const calculate = () => {
-  const newCompositeColor: ColorRGB = { r: 0, g: 0, b: 0 };
-  
-  for (const channel of Object.keys(baseColor.value) as Array<keyof ColorRGB>) {
-    const base: number = baseColor.value[channel];
-    const result: number = blendColor.value[channel];
-    
-    let S: number = 0.0;
-    let M: number = 0.0;
-    let finalValue: number = 0.0;
+/*
+ * ハードライト合成を逆算し、合成色のチャンネル値を求める
+ * @param {number} base - 基本色のチャンネル値 (0-255)
+ * @param {number} result - 結果色のチャンネル値 (0-255)
+ * @returns {number} - 逆算された合成色のチャンネル値 (0-255)
+ */
+const invertHardLightChannel = (base: number, result: number): number => {
+  let S = 0.0; // Screenモードで逆算した値
+  let M = 0.0; // Multiplyモードで逆算した値
 
-    if (base === 255) {
-      if (result === 255) {
-        S = 255;
-      } else {
-        S = -56562;
-      }
-    } else {
-      S = (255 * (-2 * base + result + 255)) / (2 * (255 - base));
-    }
-
-    if (base !== 0) {
-      M = (255 * result) / (2 * base);
-    }
-
-    if (S >= 128) {
-      finalValue = S;
-    } else {
-      finalValue = M;
-    }
-
-    const roundedValue: number = Math.round(finalValue);
-    newCompositeColor[channel] = Math.max(0, Math.min(255, roundedValue));
+  // Screenモードの逆算式。Baseが255のときはゼロ除算になるため特別に処理する。
+  if (base === 255) {
+    // Baseが255でResultは255でない場合、逆算結果はMになるため、SはMが採用されるような値にする
+    S = result === 255 ? 255 : -Infinity;
+  } else {
+    S = (255 * (-2 * base + result + 255)) / (2 * (255 - base));
   }
 
-  compositeColor.value = newCompositeColor;
-  
-  const iBase: Array<number> = [baseColor.value.r, baseColor.value.g, baseColor.value.b];
-  const iResult: Array<number> = [blendColor.value.r, blendColor.value.g, blendColor.value.b];
-  const iCom: Array<number> = [compositeColor.value.r, compositeColor.value.g, compositeColor.value.b];
+  // Multiplyモードの逆算式。Baseが0のときはゼロ除算になるため特別に処理する。
+  if (base !== 0) {
+    M = (255 * result) / (2 * base);
+  }
+
+  // Screenモードでの逆算結果(S)が128以上であればSを、そうでなければMを採用する。
+  const finalValue = S >= 128 ? S : M; // 次のブランチ "both-zero" では消す
+  // const finalValue = base === 0 && result === 0 ? 127 : (S >= 128 ? S : M); // 次のブランチ "both-zero" ではこちらを採用
+
+  const roundedValue = Math.round(finalValue);
+  // 結果を0-255の範囲に収める
+  return Math.max(0, Math.min(255, roundedValue));
+};
+
+/**
+ * 「逆算」ボタンのクリックイベントを処理する
+ */
+const handleInvertClick = () => {
+  // チャンネル名の配列 ['r', 'g', 'b'] を取得
+  const channels = Object.keys(baseColor.value) as Array<keyof ColorRGB>;
+
+  // mapメソッドとコールバック関数を使い、各チャンネルの値を計算
+  const calculatedValues = channels.map(channel =>
+    invertHardLightChannel(baseColor.value[channel], blendColor.value[channel])
+  );
+
+  // 計算結果の配列から、新しい合成色オブジェクトを生成して反映
+  compositeColor.value = {
+    r: calculatedValues[0],
+    g: calculatedValues[1],
+    b: calculatedValues[2],
+  };
+
+  const iBase = Object.values(baseColor.value);
+  const iResult = Object.values(blendColor.value);
+  const iCom = Object.values(compositeColor.value);
   console.log(`基本色=[${iBase}], 合成色=[${iCom}] ⇒ 結果色=[${iResult}]`);
 };
 
@@ -116,7 +129,7 @@ const calculate = () => {
     </div>
 
     <div class="action-row">
-      <button @click="calculate" style="font-weight: bold">逆算</button>
+      <button @click="handleInvertClick" style="font-weight: bold">逆算</button>
     </div>
 
     <div class="color-row result-row">
