@@ -33,7 +33,7 @@ const invertHardLightChannel = (base: number, result: number): number => {
 
   // Screenモードの逆算式。Baseが255のときはゼロ除算になるため特別に処理する。
   if (base === 255) {
-    // Baseが255の場合、逆算結果はMに依存するため、SはMが採用されるような値にする
+    // Baseが255でResultは255でない場合、逆算結果はMになるため、SはMが採用されるような値にする
     S = result === 255 ? 255 : -Infinity;
   } else {
     S = (255 * (-2 * base + result + 255)) / (2 * (255 - base));
@@ -45,7 +45,8 @@ const invertHardLightChannel = (base: number, result: number): number => {
   }
 
   // Screenモードでの逆算結果(S)が128以上であればSを、そうでなければMを採用する。
-  const finalValue = S >= 128 ? S : M;
+  const finalValue = S >= 128 ? S : M; // 次のブランチ "both-zero" では消す
+  // const finalValue = base === 0 && result === 0 ? 127 : (S >= 128 ? S : M); // 次のブランチ "both-zero" ではこちらを採用
 
   const roundedValue = Math.round(finalValue);
   // 結果を0-255の範囲に収める
