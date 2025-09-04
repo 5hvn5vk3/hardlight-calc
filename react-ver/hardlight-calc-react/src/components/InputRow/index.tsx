@@ -1,16 +1,11 @@
 import { InputField } from "./InputField";
-import type { RGB } from "../type";
+import type { ColorRowProps } from "../../type";
 
-type InputRowProps = {
-    whichLayer: RGB;
-    setColor: (color: RGB) => void;
-};
-
-export const InputRow = (props: InputRowProps) => {
-    const { whichLayer, setColor } = props;
+export const InputRow = (props: ColorRowProps) => {
+    const { LayerName, whichLayer, setColor } = props;
     return (
         <div className="flex items-center gap-2">
-            <span className="text-black w-15 text-sm font-bold flex-shrink-0">基本色 :</span>
+            <span className="text-black w-15 text-sm font-bold flex-shrink-0">{LayerName} :</span>
             <div className="flex gap-2">
                 <InputField whichLayer={whichLayer} partOfColor="r" label="R" setColor={setColor} />
                 <InputField whichLayer={whichLayer} partOfColor="g" label="G" setColor={setColor} />

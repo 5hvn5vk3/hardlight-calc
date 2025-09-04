@@ -1,6 +1,6 @@
-import type {InputFieldProps } from "../type";
+import type {ColorFieldProps } from "../../type";
 
-export const InputField = (props: InputFieldProps) => {
+export const InputField = (props: ColorFieldProps) => {
     const {whichLayer, partOfColor, label ,setColor} = props;
     return (
     <div className="flex items-center gap-1">
