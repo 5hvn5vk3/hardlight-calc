@@ -8,7 +8,7 @@ export const OutputField = (props: ColorFieldProps) => {
         <input
           type="number"
           value={whichLayer[partOfColor]}
-          onChange={(e) => setColor({ ...whichLayer, [partOfColor]: parseInt(e.target.value) })}
+          onChange={(e) => setColor({ ...whichLayer, [partOfColor]: parseInt(e.target.value) })} // テキストボックスを空にしたときエラーが出るがデフォルト値は設定しない
           readOnly
           className="text-black bg-gray-200 w-11 text-right p-1 border border-gray-300 rounded font-bold [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
