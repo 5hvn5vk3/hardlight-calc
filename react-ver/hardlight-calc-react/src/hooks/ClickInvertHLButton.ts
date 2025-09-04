@@ -1,6 +1,6 @@
 import type { RGB } from "../type";
 
-export const ClickInvertHLButton = (baseColor:RGB, blendColor:RGB, setCompositeColor: (color: RGB) => void) => {
+export const ClickInvertHLButton = (baseColor:RGB, blendColor:RGB, setCompositeColor: React.Dispatch<React.SetStateAction<RGB>>) => {
     const newCompositeColor = {
       r: invertHardLight(baseColor.r, blendColor.r),
       g: invertHardLight(baseColor.g, blendColor.g),
