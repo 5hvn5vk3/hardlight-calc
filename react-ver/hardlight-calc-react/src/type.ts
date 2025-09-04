@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 export type RGB = {
     r: number;
     g: number;
@@ -14,6 +15,6 @@ export type ColorFieldProps = {
 export type ColorRowProps = {
     LayerName: string;
     whichLayer: RGB;
-    setColor: (color: RGB) => void;
+    children: ReactNode;
 };
 
