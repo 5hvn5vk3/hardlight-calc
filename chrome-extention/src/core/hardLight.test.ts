@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { hardLight, pickBestCandidate, solveBlendChannel } from "./hardLight";
+import {
+  hardLight,
+  pickBestCandidate,
+  solveBlendChannel,
+  solveBlendColor,
+} from "./hardLight";
 
 describe("hardLight", () => {
   it("blend が 128 未満の式で計算する", () => {
@@ -41,5 +46,26 @@ describe("solveBlendChannel", () => {
 
     expect(blend).not.toBeNull();
     expect(hardLight(base, blend as number)).toBe(result);
+  });
+});
+
+describe("solveBlendColor", () => {
+  it("RGB3チャネルすべてで解がある場合は blend RGB を返す", () => {
+    const base = [100, 150, 200] as const;
+    const expectedBlend = [80, 140, 220] as const;
+    const result = [
+      hardLight(base[0], expectedBlend[0]),
+      hardLight(base[1], expectedBlend[1]),
+      hardLight(base[2], expectedBlend[2]),
+    ] as const;
+
+    expect(solveBlendColor(base, result)).toEqual(expectedBlend);
+  });
+
+  it("1チャネルでも解がなければ null を返す", () => {
+    const base = [0, 120, 200] as const;
+    const result = [2, 100, 150] as const;
+
+    expect(solveBlendColor(base, result)).toBeNull();
   });
 });

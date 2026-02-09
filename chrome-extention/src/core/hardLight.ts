@@ -1,4 +1,5 @@
 export type Channel = number;
+export type Rgb = readonly [Channel, Channel, Channel];
 
 export function clampChannel(value: number): Channel {
   if (!Number.isFinite(value)) {
@@ -63,4 +64,23 @@ export function solveBlendChannel(
   }
 
   return pickBestCandidate(candidates);
+}
+
+export function solveBlendColor(base: Rgb, result: Rgb): Rgb | null {
+  const r = solveBlendChannel(base[0], result[0]);
+  if (r === null) {
+    return null;
+  }
+
+  const g = solveBlendChannel(base[1], result[1]);
+  if (g === null) {
+    return null;
+  }
+
+  const b = solveBlendChannel(base[2], result[2]);
+  if (b === null) {
+    return null;
+  }
+
+  return [r, g, b];
 }
