@@ -4,6 +4,7 @@ import { solveBlendColor, type Rgb } from "./core/hardLight";
 import type { AppState } from "./core/state";
 import { copyText } from "./platform/clipboard";
 import { isEyeDropperSupported, pickColorWithEyeDropper } from "./platform/eyedropper";
+import { createToastController } from "./ui/toast";
 
 type UiRefs = {
   startBaseButton: HTMLButtonElement;
@@ -12,6 +13,7 @@ type UiRefs = {
   statusText: HTMLElement;
   toastText: HTMLElement;
 };
+
 
 function getUiRefs(): UiRefs {
   const startBaseButton = document.getElementById("start-base") as HTMLButtonElement | null;
@@ -32,13 +34,23 @@ function rgbToLabel(rgb: Rgb): string {
 }
 
 function renderFactory(ui: UiRefs) {
+  const toast = createToastController(ui.toastText);
+  let previousStatus: AppState["status"] | null = null;
+
   return (state: AppState): void => {
-    ui.toastText.textContent = "";
+    if (state.status === "success" && previousStatus !== "success") {
+      toast.showOnce(messages.successToast);
+    }
+
+    if (state.status !== "success" && previousStatus === "success") {
+      toast.clear();
+    }
 
     if (state.status === "idle") {
       ui.startBaseButton.hidden = false;
       ui.pickResultButton.hidden = true;
       ui.statusText.textContent = "基本色を取得してください";
+      previousStatus = state.status;
       return;
     }
 
@@ -46,6 +58,7 @@ function renderFactory(ui: UiRefs) {
       ui.startBaseButton.hidden = true;
       ui.pickResultButton.hidden = false;
       ui.statusText.textContent = `基本色を取得済み: ${rgbToLabel(state.base)}`;
+      previousStatus = state.status;
       return;
     }
 
@@ -53,13 +66,14 @@ function renderFactory(ui: UiRefs) {
       ui.startBaseButton.hidden = true;
       ui.pickResultButton.hidden = false;
       ui.statusText.textContent = `成功: ${state.copiedText}`;
-      ui.toastText.textContent = messages.successToast;
+      previousStatus = state.status;
       return;
     }
 
     ui.startBaseButton.hidden = state.base !== undefined;
     ui.pickResultButton.hidden = state.base === undefined;
     ui.statusText.textContent = state.message;
+    previousStatus = state.status;
   };
 }
 
