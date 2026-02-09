@@ -28,3 +28,6 @@ vue-ver/hardlight-calc/memo/
 
 # chrome extension build output
 chrome-extention/dist/
+
+# chrome extension dependencies
+chrome-extention/node_modules/

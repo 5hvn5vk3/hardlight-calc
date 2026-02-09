@@ -24,29 +24,43 @@ export function hardLight(base: Channel, blend: Channel): Channel {
   return clampChannel(255 - (2 * (255 - base) * (255 - blend)) / 255);
 }
 
+export function pickBestCandidate(candidates: Channel[]): Channel | null {
+  let bestCandidate: Channel | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (const candidate of candidates) {
+    const distance = Math.abs(candidate - 128);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestCandidate = candidate;
+      continue;
+    }
+
+    if (
+      distance === bestDistance &&
+      bestCandidate !== null &&
+      candidate > bestCandidate
+    ) {
+      bestCandidate = candidate;
+    }
+  }
+
+  return bestCandidate;
+}
+
 export function solveBlendChannel(
   base: Channel,
   result: Channel,
 ): Channel | null {
-  let bestCandidate: Channel | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
+  const candidates: Channel[] = [];
 
   for (let s = 0; s <= 255; s += 1) {
     if (hardLight(base, s) !== result) {
       continue;
     }
 
-    const distance = Math.abs(s - 128);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      bestCandidate = s;
-      continue;
-    }
-
-    if (distance === bestDistance && bestCandidate !== null && s > bestCandidate) {
-      bestCandidate = s;
-    }
+    candidates.push(s);
   }
 
-  return bestCandidate;
+  return pickBestCandidate(candidates);
 }
