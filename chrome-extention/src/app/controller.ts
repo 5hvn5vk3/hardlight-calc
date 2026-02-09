@@ -1,6 +1,6 @@
-import type { Rgb } from "../core/hardLight";
-import type { AppState } from "../core/state";
-import { initialState, transition } from "../core/state";
+import type { Rgb } from "../core/hardLight.js";
+import type { AppState } from "../core/state.js";
+import { initialState, transition } from "../core/state.js";
 
 export const messages = {
   successToast: "基本色と合成色がクリップボードに保存されました",

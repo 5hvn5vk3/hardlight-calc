@@ -1,10 +1,10 @@
-import { createPopupController, messages } from "./app/controller";
-import { formatClipboardText } from "./core/format";
-import { solveBlendColor, type Rgb } from "./core/hardLight";
-import type { AppState } from "./core/state";
-import { copyText } from "./platform/clipboard";
-import { isEyeDropperSupported, pickColorWithEyeDropper } from "./platform/eyedropper";
-import { createToastController } from "./ui/toast";
+import { createPopupController, messages } from "./app/controller.js";
+import { formatClipboardText } from "./core/format.js";
+import { solveBlendColor, type Rgb } from "./core/hardLight.js";
+import type { AppState } from "./core/state.js";
+import { copyText } from "./platform/clipboard.js";
+import { isEyeDropperSupported, pickColorWithEyeDropper } from "./platform/eyedropper.js";
+import { createToastController } from "./ui/toast.js";
 
 type UiRefs = {
   startBaseButton: HTMLButtonElement;

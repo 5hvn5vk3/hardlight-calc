@@ -1,4 +1,4 @@
-import type { Rgb } from "./hardLight";
+import type { Rgb } from "./hardLight.js";
 
 function toHexChannel(value: number): string {
   if (!Number.isInteger(value) || value < 0 || value > 255) {

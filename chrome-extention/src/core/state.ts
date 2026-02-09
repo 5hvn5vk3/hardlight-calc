@@ -1,4 +1,4 @@
-import type { Rgb } from "./hardLight";
+import type { Rgb } from "./hardLight.js";
 
 export type AppState =
   | { status: "idle" }

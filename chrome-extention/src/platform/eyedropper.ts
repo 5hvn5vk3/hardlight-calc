@@ -1,5 +1,5 @@
-import { hexToRgb } from "../core/color";
-import type { Rgb } from "../core/hardLight";
+import { hexToRgb } from "../core/color.js";
+import type { Rgb } from "../core/hardLight.js";
 
 type EyeDropperLike = {
   open: () => Promise<{ sRGBHex: string }>;

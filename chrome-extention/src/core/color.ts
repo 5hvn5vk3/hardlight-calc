@@ -1,4 +1,4 @@
-import { clampChannel, type Rgb } from "./hardLight";
+import { clampChannel, type Rgb } from "./hardLight.js";
 
 const HEX_COLOR_PATTERN = /^#([0-9a-f]{6})$/;
 
