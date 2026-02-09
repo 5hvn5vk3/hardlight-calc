@@ -73,4 +73,16 @@ describe("state transition", () => {
 
     expect(transition(errorState, { type: "RESET" })).toEqual(initialState);
   });
+
+  it("idle からでも ERROR イベントで error に遷移できる", () => {
+    expect(
+      transition(initialState, {
+        type: "ERROR",
+        message: "この環境ではスポイト機能を使用できません",
+      }),
+    ).toEqual({
+      status: "error",
+      message: "この環境ではスポイト機能を使用できません",
+    });
+  });
 });

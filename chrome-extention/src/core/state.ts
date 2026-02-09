@@ -18,6 +18,7 @@ export type AppEvent =
   | { type: "RESULT_PICK_CANCELED" }
   | { type: "RESULT_RESOLVED"; result: Rgb; blend: Rgb; copiedText: string }
   | { type: "RESULT_FAILED"; message: string }
+  | { type: "ERROR"; message: string }
   | { type: "RESET" };
 
 export const initialState: AppState = { status: "idle" };
@@ -33,6 +34,18 @@ export function transition(state: AppState, event: AppEvent): AppState {
 
   if (event.type === "BASE_PICK_CANCELED" || event.type === "RESULT_PICK_CANCELED") {
     return state;
+  }
+
+  if (event.type === "ERROR") {
+    if (state.status === "basePicked" || state.status === "success") {
+      return { status: "error", message: event.message, base: state.base };
+    }
+
+    if (state.status === "error") {
+      return { ...state, message: event.message };
+    }
+
+    return { status: "error", message: event.message };
   }
 
   if (state.status !== "basePicked") {
