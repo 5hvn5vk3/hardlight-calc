@@ -1,5 +1,15 @@
 export type Channel = number;
 export type Rgb = readonly [Channel, Channel, Channel];
+export type ChannelSolveResult = {
+  blend: Channel;
+  error: number;
+};
+export type ColorSolveResult = {
+  blend: Rgb;
+  errors: readonly [number, number, number];
+  totalError: number;
+  exactMatch: boolean;
+};
 
 export function clampChannel(value: number): Channel {
   if (!Number.isFinite(value)) {
@@ -18,6 +28,14 @@ export function clampChannel(value: number): Channel {
 }
 
 export function hardLight(base: Channel, blend: Channel): Channel {
+  if (base === 0) {
+    return clampChannel(255 - (2 * (255 - base) * (255 - blend)) / 255);
+  }
+
+  if (base === 255) {
+    return clampChannel((2 * base * blend) / 255);
+  }
+
   if (blend < 128) {
     return clampChannel((2 * base * blend) / 255);
   }
@@ -52,35 +70,47 @@ export function pickBestCandidate(candidates: Channel[]): Channel | null {
 export function solveBlendChannel(
   base: Channel,
   result: Channel,
-): Channel | null {
+): ChannelSolveResult {
   const candidates: Channel[] = [];
+  let minError = Number.POSITIVE_INFINITY;
 
   for (let s = 0; s <= 255; s += 1) {
-    if (hardLight(base, s) !== result) {
+    const predicted = hardLight(base, s);
+    const error = Math.abs(predicted - result);
+
+    if (error > minError) {
       continue;
+    }
+
+    if (error < minError) {
+      minError = error;
+      candidates.length = 0;
     }
 
     candidates.push(s);
   }
 
-  return pickBestCandidate(candidates);
+  const blend = pickBestCandidate(candidates);
+  if (blend === null) {
+    throw new Error("unreachable: no candidate found");
+  }
+
+  return { blend, error: minError };
 }
 
-export function solveBlendColor(base: Rgb, result: Rgb): Rgb | null {
+export function solveBlendColor(base: Rgb, result: Rgb): ColorSolveResult {
   const r = solveBlendChannel(base[0], result[0]);
-  if (r === null) {
-    return null;
-  }
-
   const g = solveBlendChannel(base[1], result[1]);
-  if (g === null) {
-    return null;
-  }
-
   const b = solveBlendChannel(base[2], result[2]);
-  if (b === null) {
-    return null;
-  }
 
-  return [r, g, b];
+  const blend: Rgb = [r.blend, g.blend, b.blend];
+  const errors: readonly [number, number, number] = [r.error, g.error, b.error];
+  const totalError = r.error + g.error + b.error;
+
+  return {
+    blend,
+    errors,
+    totalError,
+    exactMatch: totalError === 0,
+  };
 }

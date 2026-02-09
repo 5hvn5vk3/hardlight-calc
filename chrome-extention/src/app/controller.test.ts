@@ -10,7 +10,12 @@ function createDeps(overrides?: Partial<Parameters<typeof createPopupController>
   const deps = {
     isEyeDropperSupported: () => true,
     pickColor,
-    solveBlendColor: () => [7, 8, 9] as const,
+    solveBlendColor: () => ({
+      blend: [7, 8, 9] as const,
+      errors: [0, 0, 0] as const,
+      totalError: 0,
+      exactMatch: true,
+    }),
     formatClipboardText: () => "基本色: #010203, 合成色: #070809",
     copyText,
     render,
@@ -41,8 +46,15 @@ describe("createPopupController", () => {
     expect(copyText).toHaveBeenCalledWith("基本色: #010203, 合成色: #070809");
   });
 
-  it("解なしならコピーせず error に遷移する", async () => {
-    const { deps, pickColor, copyText } = createDeps({ solveBlendColor: () => null });
+  it("誤差あり逆算でも success に遷移しコピーする", async () => {
+    const { deps, pickColor, copyText } = createDeps({
+      solveBlendColor: () => ({
+        blend: [7, 8, 9] as const,
+        errors: [1, 0, 2] as const,
+        totalError: 3,
+        exactMatch: false,
+      }),
+    });
     pickColor.mockResolvedValueOnce([1, 2, 3]).mockResolvedValueOnce([9, 9, 9]);
 
     const controller = createPopupController(deps);
@@ -50,11 +62,16 @@ describe("createPopupController", () => {
     await controller.pickResult();
 
     expect(controller.getState()).toEqual({
-      status: "error",
+      status: "success",
       base: [1, 2, 3],
-      message: messages.reverseFailed,
+      result: [9, 9, 9],
+      blend: [7, 8, 9],
+      errors: [1, 0, 2],
+      totalError: 3,
+      exactMatch: false,
+      copiedText: "基本色: #010203, 合成色: #070809",
     });
-    expect(copyText).not.toHaveBeenCalled();
+    expect(copyText).toHaveBeenCalledWith("基本色: #010203, 合成色: #070809");
   });
 
   it("コピー失敗なら error に遷移する", async () => {

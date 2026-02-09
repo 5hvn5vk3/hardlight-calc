@@ -34,6 +34,28 @@ describe("hardLight", () => {
     expect(hardLight(0, 255)).toBe(255);
     expect(hardLight(255, 255)).toBe(255);
   });
+
+  it("特例: base=0 は blend に関係なく上側の式で計算する", () => {
+    const expected127 = Math.max(
+      0,
+      Math.min(255, Math.round(255 - (2 * (255 - 0) * (255 - 127)) / 255)),
+    );
+    const expected128 = Math.max(
+      0,
+      Math.min(255, Math.round(255 - (2 * (255 - 0) * (255 - 128)) / 255)),
+    );
+
+    expect(hardLight(0, 127)).toBe(expected127);
+    expect(hardLight(0, 128)).toBe(expected128);
+  });
+
+  it("特例: base=255 は blend に関係なく下側の式で計算する", () => {
+    const expected127 = Math.max(0, Math.min(255, Math.round((2 * 255 * 127) / 255)));
+    const expected128 = Math.max(0, Math.min(255, Math.round((2 * 255 * 128) / 255)));
+
+    expect(hardLight(255, 127)).toBe(expected127);
+    expect(hardLight(255, 128)).toBe(expected128);
+  });
 });
 
 describe("pickBestCandidate", () => {
@@ -51,26 +73,26 @@ describe("pickBestCandidate", () => {
 });
 
 describe("solveBlendChannel", () => {
-  it("解がない場合は null を返す", () => {
-    expect(solveBlendChannel(0, 2)).toBeNull();
+  it("最小誤差の候補を返す（常に1解）", () => {
+    expect(solveBlendChannel(0, 2)).toEqual({ blend: 128, error: 1 });
   });
 
-  it("候補が複数ある場合は 128 に最も近い候補を返す", () => {
-    expect(solveBlendChannel(0, 0)).toBe(127);
+  it("最小誤差候補が複数なら 128 近傍優先で返す", () => {
+    expect(solveBlendChannel(255, 215)).toEqual({ blend: 108, error: 1 });
   });
 
-  it("返した候補は順方向に適用すると result と一致する", () => {
+  it("誤差0のとき返した候補は順方向で result と一致する", () => {
     const base = 193;
     const result = 142;
     const blend = solveBlendChannel(base, result);
 
-    expect(blend).not.toBeNull();
-    expect(hardLight(base, blend as number)).toBe(result);
+    expect(blend.error).toBe(0);
+    expect(hardLight(base, blend.blend)).toBe(result);
   });
 });
 
 describe("solveBlendColor", () => {
-  it("RGB3チャネルすべてで解がある場合は blend RGB を返す", () => {
+  it("誤差0なら exactMatch=true で返す", () => {
     const base = [100, 150, 200] as const;
     const expectedBlend = [80, 140, 220] as const;
     const result = [
@@ -79,13 +101,23 @@ describe("solveBlendColor", () => {
       hardLight(base[2], expectedBlend[2]),
     ] as const;
 
-    expect(solveBlendColor(base, result)).toEqual(expectedBlend);
+    expect(solveBlendColor(base, result)).toEqual({
+      blend: expectedBlend,
+      errors: [0, 0, 0],
+      totalError: 0,
+      exactMatch: true,
+    });
   });
 
-  it("1チャネルでも解がなければ null を返す", () => {
-    const base = [0, 120, 200] as const;
-    const result = [2, 100, 150] as const;
+  it("誤差があっても常に1解を返す", () => {
+    const base = [0, 255, 128] as const;
+    const result = [2, 215, 100] as const;
 
-    expect(solveBlendColor(base, result)).toBeNull();
+    expect(solveBlendColor(base, result)).toEqual({
+      blend: [128, 108, 100],
+      errors: [1, 1, 0],
+      totalError: 2,
+      exactMatch: false,
+    });
   });
 });

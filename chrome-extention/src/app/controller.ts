@@ -5,7 +5,8 @@ import { initialState, transition } from "../core/state.js";
 export const messages = {
   successToast: "基本色と合成色がクリップボードに保存されました",
   pickFailed: "色の取得に失敗しました。もう一度お試しください",
-  reverseFailed: "合成色を逆算できませんでした",
+  approximateNotice: (errors: readonly [number, number, number]) =>
+    `近似解を使用しました（誤差: R±${errors[0]}, G±${errors[1]}, B±${errors[2]}）`,
   eyedropperUnsupported: "この環境ではスポイト機能を使用できません",
   copyFailed: "クリップボードへの保存に失敗しました",
 } as const;
@@ -13,7 +14,15 @@ export const messages = {
 export type ControllerDeps = {
   isEyeDropperSupported: () => boolean;
   pickColor: () => Promise<Rgb>;
-  solveBlendColor: (base: Rgb, result: Rgb) => Rgb | null;
+  solveBlendColor: (
+    base: Rgb,
+    result: Rgb,
+  ) => {
+    blend: Rgb;
+    errors: readonly [number, number, number];
+    totalError: number;
+    exactMatch: boolean;
+  };
   formatClipboardText: (base: Rgb, blend: Rgb) => string;
   copyText: (value: string) => Promise<void>;
   render: (state: AppState) => void;
@@ -83,22 +92,25 @@ export function createPopupController(deps: ControllerDeps) {
         return;
       }
 
-      const blend = deps.solveBlendColor(state.base, result);
-      if (blend === null) {
-        dispatch({ type: "RESULT_FAILED", message: messages.reverseFailed });
-        return;
-      }
-
-      const copiedText = deps.formatClipboardText(state.base, blend);
+      const solved = deps.solveBlendColor(state.base, result);
+      const copiedText = deps.formatClipboardText(state.base, solved.blend);
 
       try {
         await deps.copyText(copiedText);
       } catch {
-        dispatch({ type: "RESULT_FAILED", message: messages.copyFailed });
+        dispatch({ type: "COPY_FAILED", message: messages.copyFailed });
         return;
       }
 
-      dispatch({ type: "RESULT_RESOLVED", result, blend, copiedText });
+      dispatch({
+        type: "RESULT_RESOLVED",
+        result,
+        blend: solved.blend,
+        errors: solved.errors,
+        totalError: solved.totalError,
+        exactMatch: solved.exactMatch,
+        copiedText,
+      });
     },
   };
 }

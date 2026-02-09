@@ -66,7 +66,12 @@ function renderFactory(ui: UiRefs) {
     if (state.status === "success") {
       ui.startBaseButton.hidden = true;
       ui.pickResultButton.hidden = false;
-      ui.statusText.textContent = `成功: ${state.copiedText}`;
+      if (state.exactMatch) {
+        ui.statusText.textContent = `成功: ${state.copiedText}`;
+      } else {
+        ui.statusText.textContent =
+          `成功: ${state.copiedText} / ${messages.approximateNotice(state.errors)}`;
+      }
       previousStatus = state.status;
       return;
     }

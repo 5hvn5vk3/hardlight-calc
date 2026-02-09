@@ -8,6 +8,9 @@ export type AppState =
       base: Rgb;
       result: Rgb;
       blend: Rgb;
+      errors: readonly [number, number, number];
+      totalError: number;
+      exactMatch: boolean;
       copiedText: string;
     }
   | { status: "error"; message: string; base?: Rgb };
@@ -18,8 +21,16 @@ export type AppEvent =
   | { type: "BASE_PICK_CANCELED" }
   | { type: "RESULT_PICK_FAILED"; message: string }
   | { type: "RESULT_PICK_CANCELED" }
-  | { type: "RESULT_RESOLVED"; result: Rgb; blend: Rgb; copiedText: string }
-  | { type: "RESULT_FAILED"; message: string }
+  | {
+      type: "RESULT_RESOLVED";
+      result: Rgb;
+      blend: Rgb;
+      errors: readonly [number, number, number];
+      totalError: number;
+      exactMatch: boolean;
+      copiedText: string;
+    }
+  | { type: "COPY_FAILED"; message: string }
   | { type: "ERROR"; message: string }
   | { type: "RESET" };
 
@@ -66,7 +77,7 @@ export function transition(state: AppState, event: AppEvent): AppState {
     return state;
   }
 
-  if (event.type === "RESULT_FAILED") {
+  if (event.type === "COPY_FAILED") {
     return { status: "error", base: state.base, message: event.message };
   }
 
@@ -76,6 +87,9 @@ export function transition(state: AppState, event: AppEvent): AppState {
       base: state.base,
       result: event.result,
       blend: event.blend,
+      errors: event.errors,
+      totalError: event.totalError,
+      exactMatch: event.exactMatch,
       copiedText: event.copiedText,
     };
   }

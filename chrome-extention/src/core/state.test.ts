@@ -36,6 +36,9 @@ describe("state transition", () => {
       type: "RESULT_RESOLVED",
       result: [100, 110, 120],
       blend: [90, 95, 100],
+      errors: [0, 0, 0],
+      totalError: 0,
+      exactMatch: true,
       copiedText: "基本色: #0a141e, 合成色: #5a5f64",
     });
 
@@ -44,25 +47,28 @@ describe("state transition", () => {
       base: [10, 20, 30],
       result: [100, 110, 120],
       blend: [90, 95, 100],
+      errors: [0, 0, 0],
+      totalError: 0,
+      exactMatch: true,
       copiedText: "基本色: #0a141e, 合成色: #5a5f64",
     });
   });
 
-  it("basePicked -> error (逆算失敗またはコピー失敗)", () => {
+  it("basePicked -> error (コピー失敗)", () => {
     const current = {
       status: "basePicked" as const,
       base: [10, 20, 30] as const,
     };
 
     const next = transition(current, {
-      type: "RESULT_FAILED",
-      message: "解が存在しません",
+      type: "COPY_FAILED",
+      message: "クリップボードへの保存に失敗しました",
     });
 
     expect(next).toEqual({
       status: "error",
       base: [10, 20, 30],
-      message: "解が存在しません",
+      message: "クリップボードへの保存に失敗しました",
     });
   });
 
