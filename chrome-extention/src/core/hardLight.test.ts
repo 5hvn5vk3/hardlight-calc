@@ -14,6 +14,26 @@ describe("hardLight", () => {
   it("blend が 128 以上の式で計算する", () => {
     expect(hardLight(100, 200)).toBe(188);
   });
+
+  it("境界値: blend=0 で最小側の挙動を満たす", () => {
+    expect(hardLight(0, 0)).toBe(0);
+    expect(hardLight(255, 0)).toBe(0);
+  });
+
+  it("境界値: blend=127 は 128 未満の式で計算する", () => {
+    expect(hardLight(100, 127)).toBe(Math.round((2 * 100 * 127) / 255));
+  });
+
+  it("境界値: blend=128 は 128 以上の式で計算する", () => {
+    expect(hardLight(100, 128)).toBe(
+      Math.round(255 - (2 * (255 - 100) * (255 - 128)) / 255),
+    );
+  });
+
+  it("境界値: blend=255 で最大側の挙動を満たす", () => {
+    expect(hardLight(0, 255)).toBe(255);
+    expect(hardLight(255, 255)).toBe(255);
+  });
 });
 
 describe("pickBestCandidate", () => {
