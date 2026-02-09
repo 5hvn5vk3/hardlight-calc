@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "tsc -p tsconfig.build.json"
   },
   "devDependencies": {
     "typescript": "^5.8.0",
