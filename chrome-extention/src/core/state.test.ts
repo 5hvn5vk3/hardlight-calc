@@ -14,6 +14,18 @@ describe("state transition", () => {
     });
   });
 
+  it("基本色取得失敗時は idle を維持しメッセージを保持する", () => {
+    const next = transition(initialState, {
+      type: "BASE_PICK_FAILED",
+      message: "色の取得に失敗しました。もう一度お試しください",
+    });
+
+    expect(next).toEqual({
+      status: "idle",
+      message: "色の取得に失敗しました。もう一度お試しください",
+    });
+  });
+
   it("basePicked -> success (結果取得・逆算・コピー成功)", () => {
     const current = {
       status: "basePicked" as const,
@@ -62,6 +74,24 @@ describe("state transition", () => {
 
     expect(transition(current, { type: "BASE_PICK_CANCELED" })).toEqual(current);
     expect(transition(current, { type: "RESULT_PICK_CANCELED" })).toEqual(current);
+  });
+
+  it("結果色取得失敗時は basePicked を維持しメッセージを保持する", () => {
+    const current = {
+      status: "basePicked" as const,
+      base: [10, 20, 30] as const,
+    };
+
+    const next = transition(current, {
+      type: "RESULT_PICK_FAILED",
+      message: "色の取得に失敗しました。もう一度お試しください",
+    });
+
+    expect(next).toEqual({
+      status: "basePicked",
+      base: [10, 20, 30],
+      message: "色の取得に失敗しました。もう一度お試しください",
+    });
   });
 
   it("任意状態 -> idle (リセット)", () => {

@@ -49,7 +49,7 @@ function renderFactory(ui: UiRefs) {
     if (state.status === "idle") {
       ui.startBaseButton.hidden = false;
       ui.pickResultButton.hidden = true;
-      ui.statusText.textContent = "基本色を取得してください";
+      ui.statusText.textContent = state.message ?? "基本色を取得してください";
       previousStatus = state.status;
       return;
     }
@@ -57,7 +57,8 @@ function renderFactory(ui: UiRefs) {
     if (state.status === "basePicked") {
       ui.startBaseButton.hidden = true;
       ui.pickResultButton.hidden = false;
-      ui.statusText.textContent = `基本色を取得済み: ${rgbToLabel(state.base)}`;
+      ui.statusText.textContent =
+        state.message ?? `基本色を取得済み: ${rgbToLabel(state.base)}`;
       previousStatus = state.status;
       return;
     }

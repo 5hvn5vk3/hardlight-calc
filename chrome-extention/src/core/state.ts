@@ -1,8 +1,8 @@
 import type { Rgb } from "./hardLight.js";
 
 export type AppState =
-  | { status: "idle" }
-  | { status: "basePicked"; base: Rgb }
+  | { status: "idle"; message?: string }
+  | { status: "basePicked"; base: Rgb; message?: string }
   | {
       status: "success";
       base: Rgb;
@@ -14,7 +14,9 @@ export type AppState =
 
 export type AppEvent =
   | { type: "BASE_PICKED"; base: Rgb }
+  | { type: "BASE_PICK_FAILED"; message: string }
   | { type: "BASE_PICK_CANCELED" }
+  | { type: "RESULT_PICK_FAILED"; message: string }
   | { type: "RESULT_PICK_CANCELED" }
   | { type: "RESULT_RESOLVED"; result: Rgb; blend: Rgb; copiedText: string }
   | { type: "RESULT_FAILED"; message: string }
@@ -30,6 +32,18 @@ export function transition(state: AppState, event: AppEvent): AppState {
 
   if (event.type === "BASE_PICKED") {
     return { status: "basePicked", base: event.base };
+  }
+
+  if (event.type === "BASE_PICK_FAILED") {
+    return { status: "idle", message: event.message };
+  }
+
+  if (event.type === "RESULT_PICK_FAILED") {
+    if (state.status !== "basePicked") {
+      return state;
+    }
+
+    return { ...state, message: event.message };
   }
 
   if (event.type === "BASE_PICK_CANCELED" || event.type === "RESULT_PICK_CANCELED") {

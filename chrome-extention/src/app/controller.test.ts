@@ -86,6 +86,35 @@ describe("createPopupController", () => {
     });
   });
 
+  it("基本色の取得失敗時は idle を維持してエラーメッセージを持つ", async () => {
+    const { deps, pickColor } = createDeps();
+    pickColor.mockRejectedValueOnce(new Error("pick failed"));
+
+    const controller = createPopupController(deps);
+    await controller.startBasePick();
+
+    expect(controller.getState()).toEqual({
+      status: "idle",
+      message: messages.pickFailed,
+    });
+  });
+
+  it("結果色の取得失敗時は basePicked を維持してエラーメッセージを持つ", async () => {
+    const { deps, pickColor, copyText } = createDeps();
+    pickColor.mockResolvedValueOnce([1, 2, 3]).mockRejectedValueOnce(new Error("pick failed"));
+
+    const controller = createPopupController(deps);
+    await controller.startBasePick();
+    await controller.pickResult();
+
+    expect(controller.getState()).toEqual({
+      status: "basePicked",
+      base: [1, 2, 3],
+      message: messages.pickFailed,
+    });
+    expect(copyText).not.toHaveBeenCalled();
+  });
+
   it("キャンセルは状態維持", async () => {
     const abortError = new DOMException("cancel", "AbortError");
     const { deps, pickColor } = createDeps();

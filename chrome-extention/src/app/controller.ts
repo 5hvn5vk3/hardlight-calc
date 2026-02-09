@@ -4,6 +4,7 @@ import { initialState, transition } from "../core/state.js";
 
 export const messages = {
   successToast: "基本色と合成色がクリップボードに保存されました",
+  pickFailed: "色の取得に失敗しました。もう一度お試しください",
   reverseFailed: "合成色を逆算できませんでした",
   eyedropperUnsupported: "この環境ではスポイト機能を使用できません",
   copyFailed: "クリップボードへの保存に失敗しました",
@@ -60,7 +61,7 @@ export function createPopupController(deps: ControllerDeps) {
           return;
         }
 
-        dispatch({ type: "ERROR", message: messages.eyedropperUnsupported });
+        dispatch({ type: "BASE_PICK_FAILED", message: messages.pickFailed });
       }
     },
 
@@ -78,7 +79,7 @@ export function createPopupController(deps: ControllerDeps) {
           return;
         }
 
-        dispatch({ type: "RESULT_FAILED", message: messages.reverseFailed });
+        dispatch({ type: "RESULT_PICK_FAILED", message: messages.pickFailed });
         return;
       }
 
