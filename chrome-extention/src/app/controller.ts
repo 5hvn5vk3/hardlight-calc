@@ -6,7 +6,7 @@ export const messages = {
   successToast: "基本色と合成色がクリップボードに保存されました",
   pickFailed: "色の取得に失敗しました。もう一度お試しください",
   approximateNotice: (errors: readonly [number, number, number]) =>
-    `近似解を使用しました（誤差: R±${errors[0]}, G±${errors[1]}, B±${errors[2]}）`,
+    `基本色と合成色がクリップボードに保存されました。近似解を使用しました（誤差: R±${errors[0]}, G±${errors[1]}, B±${errors[2]}）`,
   eyedropperUnsupported: "この環境ではスポイト機能を使用できません",
   copyFailed: "クリップボードへの保存に失敗しました",
 } as const;
