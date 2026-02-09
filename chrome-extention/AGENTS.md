@@ -24,4 +24,5 @@
 
 ## 開発フロー
 
+- `SPECIFICATION.md`に従う
 - TDDで進める
